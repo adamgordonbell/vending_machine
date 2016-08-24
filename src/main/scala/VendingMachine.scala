@@ -4,7 +4,7 @@ import scala.collection.mutable.{Map => MMap}
 /**
   * Created by adam on 8/23/16.
   */
-case class VendingMachine(items : Inventory) {
+case class VendingMachine[T](items : Inventory[T]) {
   var balance : BigDecimal = 0
   def addToBalance(money : BigDecimal): Unit = {
     balance += money
@@ -17,17 +17,17 @@ case class VendingMachine(items : Inventory) {
     balance = 0
     amount
   }
-  def buyProductWithBalance(row : Char, column : Int) : Either[String,Product] = {
+  def buyProductWithBalance(index : T) : Either[String,Product] = {
     def buyItem(inventory : InventoryItem): Either[String,Product] = {
         if(balance >= inventory.price){
-          val product = items.take(row,column)
+          val product = items.take(index)
           balance -= inventory.price
           product
         } else {
           Left("Insufficent Funds")
         }
     }
-    items.get(row,column) match {
+    items.get(index) match {
       case Some(inventory) => buyItem(inventory)
       case None => Left("Product does not exist")
     }

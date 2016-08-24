@@ -23,7 +23,15 @@ class VendingMachineSpec extends FlatSpec with Matchers with EitherValues {
     machine.addToBalance(10)
     val first = machine.buyProductWithBalance('a',2)
     val second = machine.buyProductWithBalance('a',2)
+    machine.withdrawBalance()
     second.left.value should be ("Product Out Of Stock")
+  }
+
+  it should "give change back" in {
+    machine.addToBalance(10)
+    val item = machine.buyProductWithBalance('a',1)
+    val change = machine.withdrawBalance()
+    change should be (8.95)
   }
 }
 
