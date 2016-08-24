@@ -33,13 +33,14 @@ class VendingMachineSpec extends FlatSpec with Matchers with EitherValues {
     val change = machine.withdrawBalance()
     change should be (8.95)
   }
+
+  it should "support configurable indexes" in {
+    val machine = new VendingMachine(Inventory(MMap(
+      'A' ->  InventoryItem(Product("Apple"),1,20),
+      'B' -> InventoryItem(Product("Orange"),2,25)
+    )))
+    machine.addToBalance(10)
+    val item = machine.buyProductWithBalance('A')
+    item.right.value should be(Product("Apple"))
+  }
 }
-
-
-// questions
-// Do I actually build and API, or just the code the api should call
-//    -- I would just expose this a some play endpoints in real world
-// Does concurrency matter
-//  -- I have never seen a concurrent vending machine
-// Does making change matter?
-// -- making change is about the only challenging part I can think of in this domain
