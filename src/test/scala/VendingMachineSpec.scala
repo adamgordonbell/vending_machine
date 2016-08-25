@@ -1,13 +1,15 @@
 import data._
 import org.scalatest._
 
-import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.{Map => MMap, ListBuffer => MList}
 
 class VendingMachineSpec extends FlatSpec with Matchers with EitherValues {
+  val change = Change(MList(25,25,25,25,25,25,25,25,25,10,10,10,10,10,10,10,10,10,5,5,5,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1))
   val machine = new VendingMachine(Inventory(MMap(
-      ('a',1) ->  InventoryItem(Product("Snickers"),1.05,10),
-      ('a',2) -> InventoryItem(Product("Mars"),0.95,1)
-    )))
+      ('a',1) ->  InventoryItem(Product("Snickers"),105,10),
+      ('a',2) -> InventoryItem(Product("Mars"),95,1)
+    )), change)
+  val pocketChange = List(25,25,25,25,25,25,25,25,25,25,25,10,5)
 
   it should "not allow buying of product that isn't there" in {
     val response: Either[String, Product] = machine.buyProductWithBalance('a',15)
@@ -20,7 +22,7 @@ class VendingMachineSpec extends FlatSpec with Matchers with EitherValues {
   }
 
   it should "not sell more than it has" in {
-    machine.addToBalance(10)
+    machine.addToBalance(pocketChange)
     val first = machine.buyProductWithBalance('a',2)
     val second = machine.buyProductWithBalance('a',2)
     machine.withdrawBalance()
@@ -28,7 +30,7 @@ class VendingMachineSpec extends FlatSpec with Matchers with EitherValues {
   }
 
   it should "give change back" in {
-    machine.addToBalance(10)
+    machine.addToBalance(pocketChange)
     val item = machine.buyProductWithBalance('a',1)
     val change = machine.withdrawBalance()
     change should be (8.95)
@@ -38,8 +40,8 @@ class VendingMachineSpec extends FlatSpec with Matchers with EitherValues {
     val machine = new VendingMachine(Inventory(MMap(
       'A' ->  InventoryItem(Product("Apple"),1,20),
       'B' -> InventoryItem(Product("Orange"),2,25)
-    )))
-    machine.addToBalance(10)
+    )), change)
+    machine.addToBalance(pocketChange)
     val item = machine.buyProductWithBalance('A')
     item.right.value should be(Product("Apple"))
   }
